@@ -6,38 +6,44 @@ import "./personFacade"
 import personFacade from "./personFacade"
 import 'regenerator-runtime/runtime'
 
-function writePersons() {
-  personFacade
-    .getPersons()
-    .then((persons) => {
-      const personRows = persons.map(
-        (person) => `
-        <tr>
-            <td scope="row">${person.email}</td>
-            <td>${person.firstName}</td>
-            <td>${person.lastName}</td>
-            <td>${person.phone.phoneNumber}</td>
-            <td>${person.hobby.name}</td>
-            <td>${person.address.street}</td>
-            <td>${person.address.additionalInfo}</td>
-        </tr>
-        `
-      );
-      const personRowsAsString = personRows.join("");
-      document.getElementById("table__body").innerHTML = personRowsAsString;
-      document.getElementById("table__head").innerHTML = `<tr><th scope="col">Email</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Phone</th><th scope="col">Hobbies</th><th scope="col">Street Name</th><th scope="col">Street Additional Info</th></tr>`;
-    })
-    .catch((err) => {
-      if (err.status) {
-        err.fullError.then((e) => console.log(e.msg));
-      } else {
-        console.log("Network error");
-        console.log(err);
-      }
-    });
-}
+// function writePersons() {
+//   personFacade
+//     .getPersons()
+//     .then((persons) => {
+//       const personRows = persons.map(
+//         (person) => `
+//         <tr>
+//             <td scope="row">${person.email}</td>
+//             <td>${person.firstName}</td>
+//             <td>${person.lastName}</td>
+//             <td>${person.phone.phoneNumber}</td>
+//             <td>${person.hobby.name}</td>
+//             <td>${person.address.street}</td>
+//             <td>${person.address.additionalInfo}</td>
+//         </tr>
+//         `
+//       );
+//       const personRowsAsString = personRows.join("");
+//       document.getElementById("table__body").innerHTML = personRowsAsString;
+//       document.getElementById("table__head").innerHTML = `<tr><th scope="col">Email</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Phone</th><th scope="col">Hobbies</th><th scope="col">Street Name</th><th scope="col">Street Additional Info</th></tr>`;
+//     })
+//     .catch((err) => {
+//       if (err.status) {
+//         err.fullError.then((e) => console.log(e.msg));
+//       } else {
+//         console.log("Network error");
+//         console.log(err);
+//       }
+//     });
+// }
 
-writePersons();
+// function writePersons() {
+//   let person = personFacade.getPersons("person");
+//   // .then((persons) => console.log(persons.email));
+//   console.log("Hello from writePersons: " + personFacade.getPersons());
+// }
+
+// writePersons();
 
 //import "babel-polyfill"
 
