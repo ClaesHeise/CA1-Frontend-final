@@ -1,197 +1,123 @@
-// import "./style.css"
-import "bootstrap/dist/css/bootstrap.css"
-import * as bootstrap from 'bootstrap';
-import '@popperjs/core';
-import "./personFacade"
-import personFacade from "./personFacade"
-import 'regenerator-runtime/runtime'
+const SERVER_URL = "http://onebrightcreation.com:8081/CA-1/api/";
 
-// function writePersons() {
-//   personFacade
-//     .getPersons()
-//     .then((persons) => {
-//       const personRows = persons.map(
-//         (person) => `
-//         <tr>
-//             <td scope="row">${person.email}</td>
-//             <td>${person.firstName}</td>
-//             <td>${person.lastName}</td>
-//             <td>${person.phone.phoneNumber}</td>
-//             <td>${person.hobby.name}</td>
-//             <td>${person.address.street}</td>
-//             <td>${person.address.additionalInfo}</td>
-//         </tr>
-//         `
-//       );
-//       const personRowsAsString = personRows.join("");
-//       document.getElementById("table__body").innerHTML = personRowsAsString;
-//       document.getElementById("table__head").innerHTML = `<tr><th scope="col">Email</th><th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">Phone</th><th scope="col">Hobbies</th><th scope="col">Street Name</th><th scope="col">Street Additional Info</th></tr>`;
-//     })
-//     .catch((err) => {
-//       if (err.status) {
-//         err.fullError.then((e) => console.log(e.msg));
-//       } else {
-//         console.log("Network error");
-//         console.log(err);
-//       }
-//     });
-// }
+const formButton = document.getElementById("form");
 
-// function writePersons() {
-//   let person = personFacade.getPersons("person");
-//   // .then((persons) => console.log(persons.email));
-//   console.log("Hello from writePersons: " + personFacade.getPersons());
-// }
+function getPersons(apiCall) {
+    if (apiCall === undefined){
+        apiCall = "person"
+    }
+    fetch(SERVER_URL+apiCall)
+    .then((res) => handleHttpErrors(res))
+    .then((data) => personToTable(data))
+    .catch(err => {console.log(err);});
+}
 
-// writePersons();
+function getZips(apiCall) {
+    if (apiCall === undefined){
+        apiCall = "person"
+    }
+    fetch(SERVER_URL+apiCall)
+    .then((res) => handleHttpErrors(res))
+    .then((data) => zipToTable(data))
+    .catch(err => {console.log(err);});
+}
 
-//import "babel-polyfill"
+function makeOptions(method, body) {
+    const opts = {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+    }
+    if (body) {
+        opts.body = JSON.stringify(body)
+    }
+    return opts
+}
 
-// document.getElementById("all-content").style.display = "block"
+const handleHttpErrors = function(response) {
+  if(!response.ok){
+    throw (response.status + ': ' + response.statusText);
+  }
+  return response.json();
+}
 
-// /* 
-//   Add your JavaScript for all exercises Below or in separate js-files, which you must the import above
-// */
+document.getElementById("getAll").addEventListener("click", async () => {
+    getPersons("person/");
+});
 
-// /* JS For Exercise-1 below */
-// function makeListItem() {
-//   const jokes = jokeFacade.getJokes();
-//   let jokeLis = jokes.map(joke => `<li> ${joke} </li>`);
-//   const listItemAsString = jokeLis.join('');
-//   document.querySelector("#jokes").innerHTML = listItemAsString;
-// }
-// makeListItem();
-// const jokeButton = document.getElementById("jokeButton");
+document.getElementById("getAllZip").addEventListener("click", async () => {
+    getZips("person/zips");
+});
 
-// jokeButton.addEventListener("click", () => {
-//   console.log("Hello");
-//   let userInput = document.getElementById("jokeInput").value;
-//   const joke = jokeFacade.getJokeById(userInput);
-//   document.getElementById("myTag").innerHTML = joke;
-// });
+document.getElementById("searchHobby").addEventListener("click", async () => {
+    const input = document.getElementById("Input 1").value;
+    getPersons("hobby/"+input);
+});
 
-// const addJokeBtn = document.getElementById("addJokeBtn");
+document.getElementById("searchPhone").addEventListener("click", async () => {
+    const input = document.getElementById("Input 1").value;
+    getPersons("person/phone/"+input);
+});
 
-// addJokeBtn.addEventListener("click", () => {
-//   let userInput = document.getElementById("jokesInput").value;
-//   jokeFacade.addJoke(userInput);
-//   makeListItem();
-// });
+const personToTable = function (request) {
+  let persons = request;
+  console.log(persons[0].phone[0].number);
+    const personRows = persons.map(
+        (person) => `
+        <tr>
+            <td scope="row">${person.email}</td>
+            <td>${person.firstName}</td>
+            <td>${person.lastName}</td>
+            <td>${person.phone[0].number}</td>
+            <td>${person.hobbies[0].hobby_name}</td>
+            <td>${person.address.street}</td>
+            <td>${person.address.additionalInfo}</td>
+        </tr>
+        `
+      );
+      const personRowsAsString = personRows.join("");
+      document.getElementById("table__body").innerHTML = personRowsAsString;
+}
 
-// /* JS For Exercise-2 below */
-// const chuckBtn = document.getElementById("ex2btn");
-// const chuckURL = 'https://api.chucknorris.io/jokes/random';
-// const nrURL = 'https://api.dataforsyningen.dk/postnumre';
-// const personURL = 'http://onebrightcreation.com:8081/CA-1/api/person/';
+const zipToTable = function (request) {
+    let zips = request;
+    // console.log(persons[0].phone[0].number);
+      const zipRows = zips.map(
+          (zip) => `
+          <tr>
+              <td scope="row">${zip.nr}</td>
+              <td>${zip.navn}</td>
+          </tr>
+          `
+        );
+        const zipRowsAsString = zipRows.join("");
+        document.getElementById("table__body_zip").innerHTML = zipRowsAsString;
+  }
 
-// async function getPerson() {
-//   fetch(personURL)
-//         .then((response) => fetchErrors(response))
-//         .then((data) => console.log(data))
-//         .catch(err => {console.log(err);});
-// }
-
-// async function getZip(url) {
-//   fetch(url)
-//         .then((response) => fetchErrors(response))
-//         .then((data) => getZipValues(data))
-//         .catch(err => {console.log(err);});
-// }
-
-// const getZipValues = function (request) {
-//   let zip = request;
-//   // zip.array.forEach(element => {
-//   //   console.log(element.nr + element.navn);
-//   // });
-//   zip.forEach(el => {
-//     console.log(el.navn + " : " + el.nr)
-//   });
-//   console.log(zip[0].navn + zip[0].nr);
-//   //console.log(chuckQuote[0].name);
-//   //document.getElementById("ex2output").innerHTML = chuckQuote.value;
-// }
-
-// getZip(nrURL);
-// //const chuckURL = 'https://jsonplaceholder.typicode.com/users/';
-
-
-// // const getChuck = async (url) => {
-// //   try {
-// //     const res = await fetch(
-// //       url
-// //     );
-// //     if (!res.ok) {
-// //       console.log("status: ", res.status);
-// //       // carful you don't get an infinite loop
-// //       await getChuck();
-// //     }
-// //     const json = await res.json();
-// //     getChuckQuote(json);
-// //     console.log(json);
-// //   } catch (error) {
-// //     console.log("catch error", error);
-// //     // carful you don't get an infinite loop
-// //     await getChuck();
-// //   }
-// // };
-
-// const fetchErrors = function(response) {
-//   if(!response.ok){
-//     throw (response.status + ': ' + response.statusText);
-//   }
-//   return response.json();
-// }
-
-// async function getChuck(url) {
-//   fetch(chuckURL)
-//         .then((response) => fetchErrors(response))
-//         .then((data) => getChuckQuote(data))
-//         .catch(err => {console.log(err);});
-// }
-
-// chuckBtn.addEventListener("click", async () => {
-//   // await getChuck(chuckURL);
-//   await getPerson();
-
-// });
-
-// const getChuckQuote = function (request) {
-//   let chuckQuote = request;
-//   //console.log(chuckQuote[0].name);
-//   document.getElementById("ex2output").innerHTML = chuckQuote.value;
-// }
-
-// /* JS For Exercise-3 below */
-
-
-// /* 
-// Do NOT focus on the code below, UNLESS you want to use this code for something different than
-// the Period2-week2-day3 Exercises
-// */
-
-// function hideAllShowOne(idToShow)
-// {
-//   document.getElementById("about_html").style = "display:none"
-//   document.getElementById("ex1_html").style = "display:none"
+function hideAllShowOne(idToShow)
+{
+  document.getElementById("home_html").style = "display:none"
+  document.getElementById("zip_html").style = "display:none"
 //   document.getElementById("ex2_html").style = "display:none"
 //   document.getElementById("ex3_html").style = "display:none"
-//   document.getElementById(idToShow).style = "display:block"
-// }
+  document.getElementById(idToShow).style = "display:block"
+}
 
-// function menuItemClicked(evt)
-// {
-//   const id = evt.target.id;
-//   switch (id)
-//   {
-//     case "ex1": hideAllShowOne("ex1_html"); break
-//     case "ex2": hideAllShowOne("ex2_html"); break
-//     case "ex3": hideAllShowOne("ex3_html"); break
-//     default: hideAllShowOne("about_html"); break
-//   }
-//   evt.preventDefault();
-// }
-// document.getElementById("menu").onclick = menuItemClicked;
-// hideAllShowOne("about_html");
+function menuItemClicked(evt)
+{
+  const id = evt.target.id;
+  switch (id)
+  {
+    case "link-1": hideAllShowOne("home_html"); break
+    case "link-2": hideAllShowOne("zip_html"); break
+    // case "ex3": hideAllShowOne("ex3_html"); break
+    default: hideAllShowOne("home_html"); break
+  }
+  evt.preventDefault();
+}
+document.getElementById("menu").onclick = menuItemClicked;
+hideAllShowOne("home_html");
 
-
-
+getPersons("person/");
